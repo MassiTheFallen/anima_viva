@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: animaviva-bot
+    env: python
+    buildCommand: ""
+    startCommand: "python main.py"
+    plan: free
+    envVars:
+      - key: API_KEY
+        sync: false
