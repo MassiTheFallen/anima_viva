@@ -27,4 +27,9 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-    app.run_polling()
+    PORT = int(os.environ.get("PORT", "8000"))
+app.run_webhook(
+    listen="0.0.0.0",
+    port=PORT,
+    webhook_url="https://anima-viva.onrender.com/"
+)
