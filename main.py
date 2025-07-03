@@ -1,39 +1,39 @@
 import os
-import asyncio
+import requests
 from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+from telegram.ext import Application, MessageHandler, filters, ContextTypes
 
-TOKEN = os.getenv("API_KEY")
+# Configurazione semplice
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')
 
-async def query_chatgpt(message):
-    # Simulazione ChatGPT
-    await asyncio.sleep(1)
-    return f"ChatGPT dice: {message}"
+async def rispondi(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Prendi il messaggio dell'utente
+    messaggio = update.message.text
+    
+    # Chiama DeepSeek
+    headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}"}
+    data = {
+        "model": "deepseek-chat",
+        "messages": [{"role": "user", "content": messaggio}]
+    }
+    
+    try:
+        risposta = requests.post(
+            "https://api.deepseek.com/chat/completions",
+            json=data,
+            headers=headers
+        ).json()
+        
+        # Estrai il testo della risposta
+        testo_risposta = risposta['choices'][0]['message']['content']
+        await update.message.reply_text(testo_risposta)
+    
+    except Exception as e:
+        await update.message.reply_text(f"❌ Errore: {str(e)}")
 
-async def query_deepseek(message):
-    # Simulazione DeepSeek
-    await asyncio.sleep(1)
-    return f"DeepSeek risponde a: {message[:30]}..."
-
-async def query_gemini(message):
-    # Simulazione Gemini
-    await asyncio.sleep(1)
-    return f"Gemini commenta: {message[:30]}..."
-
-async def orchestrator(message):
-    results = await asyncio.gather(
-        query_chatgpt(message),
-        query_deepseek(message),
-        query_gemini(message)
-    )
-    return "\n\n".join(results)
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    response = await orchestrator(text)
-    await update.message.reply_text(response)
-
-if __name__ == "__main__":
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
-    app.run_polling()
+# Avvio del bot
+app = Application.builder().token(TELEGRAM_TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT, rispondi))
+print("🟢 BOT AVVIATO!")
+app.run_polling()
