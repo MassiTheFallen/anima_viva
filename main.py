@@ -8,7 +8,7 @@ TOKEN = os.getenv("API_KEY")
 async def query_chatgpt(message):
     # Simulazione ChatGPT
     await asyncio.sleep(1)
-    return f"ChatGPT dice: {message[:30]}..."
+    return f"ChatGPT dice: {message}"
 
 async def query_deepseek(message):
     # Simulazione DeepSeek
