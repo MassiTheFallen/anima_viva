@@ -1,9 +1,9 @@
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import os
 
-TOKEN = "7173358240:AAGwChnArLqKi71yzQRhWOXlBbPVA-ScvfE"
+TOKEN = os.getenv("API_KEY")
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,9 +27,12 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-    PORT = int(os.environ.get("PORT", "8000"))
-app.run_webhook(
-    listen="0.0.0.0",
-    port=PORT,
-    webhook_url="https://anima-viva.onrender.com/"
-)
+    PORT = int(os.environ.get('PORT', '8443'))
+    WEBHOOK_URL = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}/bot{TOKEN}"
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=f"bot{TOKEN}",
+        webhook_url=WEBHOOK_URL
+    )
