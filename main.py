@@ -1,24 +1,24 @@
 import os
 import asyncio
 from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 
 TOKEN = os.getenv("API_KEY")
 
 async def query_chatgpt(message):
     # Simulazione ChatGPT
     await asyncio.sleep(1)
-    return f"ChatGPT dice: {message[::-1]}"  # testo invertito per esempio
+    return f"ChatGPT dice: {message[:30]}..."
 
 async def query_deepseek(message):
     # Simulazione DeepSeek
     await asyncio.sleep(1)
-    return f"DeepSeek risponde a: {message}"
+    return f"DeepSeek risponde a: {message[:30]}..."
 
 async def query_gemini(message):
     # Simulazione Gemini
     await asyncio.sleep(1)
-    return f"Gemini commenta: {message}"
+    return f"Gemini commenta: {message[:30]}..."
 
 async def orchestrator(message):
     results = await asyncio.gather(
@@ -35,5 +35,5 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     app.run_polling()
